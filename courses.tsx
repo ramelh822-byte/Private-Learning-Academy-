@@ -1,3 +1,4 @@
+
 import Head from 'next/head';
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
@@ -12,20 +13,35 @@ export default function CoursesPage() {
 
   const allCategories = [
     { id: 'all', label: 'All Courses', emoji: '✨' },
-    ...categories.map((c) => ({ id: c.id, label: c.label, emoji: c.emoji })),
+    ...categories.map((category) => ({
+      id: category.id,
+      label: category.label,
+      emoji: category.emoji,
+    })),
   ];
 
-  const filtered = courses.filter((c) => {
-    const matchCat =
+  const normalizedSearch = search.trim().toLowerCase();
+
+  const filtered = courses.filter((course) => {
+    const selectedCategory = categories.find(
+      (category) => category.id === activeFilter
+    );
+
+    const matchCategory =
       activeFilter === 'all' ||
-      categories.find((cat) => cat.id === activeFilter)?.label === c.category;
+      selectedCategory?.label === course.category;
+
     const matchSearch =
-      search === '' ||
-      c.title.toLowerCase().includes(search.toLowerCase()) ||
-      c.category.toLowerCase().includes(search.toLowerCase()) ||
-      c.description.toLowerCase().includes(search.toLowerCase());
-    return matchCat && matchSearch;
+      normalizedSearch === '' ||
+      course.title.toLowerCase().includes(normalizedSearch) ||
+      course.category.toLowerCase().includes(normalizedSearch) ||
+      course.description.toLowerCase().includes(normalizedSearch);
+
+    return matchCategory && matchSearch;
   });
+
+  const showCategorySections =
+    activeFilter === 'all' && normalizedSearch === '';
 
   return (
     <>
@@ -33,7 +49,7 @@ export default function CoursesPage() {
         <title>All Courses — Planet Leads Academy</title>
         <meta
           name="description"
-          content="Browse all 25 AI-powered courses across Faith, Languages, Music, Programming, and Business."
+          content="Explore AI-guided courses in Faith, Languages, Music, Programming, and Business at Planet Leads Academy."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
@@ -42,73 +58,118 @@ export default function CoursesPage() {
         <Navbar />
 
         <main className={styles.main}>
-          <div className={styles.hero}>
+          <section className={styles.hero}>
             <div className={styles.heroBg} />
+
             <div className="container">
               <h1 className={styles.title}>All Courses</h1>
+
               <p className={styles.sub}>
-                {courses.length} AI-powered courses across {categories.length} categories
+                {courses.length} AI-powered courses across{' '}
+                {categories.length} categories
               </p>
+
               <div className={styles.searchWrap}>
-                <span className={styles.searchIcon}>🔍</span>
+                <span className={styles.searchIcon} aria-hidden="true">
+                  🔍
+                </span>
+
                 <input
                   className={styles.search}
-                  type="text"
-                  placeholder="Search courses…"
+                  type="search"
+                  placeholder="Search courses..."
+                  aria-label="Search courses"
                   value={search}
-                  onChange={(e) => setSearch(e.target.value)}
+                  onChange={(event) => setSearch(event.target.value)}
                 />
+
                 {search && (
-                  <button className={styles.searchClear} onClick={() => setSearch('')}>✕</button>
+                  <button
+                    type="button"
+                    className={styles.searchClear}
+                    onClick={() => setSearch('')}
+                    aria-label="Clear search"
+                  >
+                    ✕
+                  </button>
                 )}
               </div>
             </div>
-          </div>
+          </section>
 
           <div className="container">
-            {/* Filter pills */}
-            <div className={styles.filters}>
-              {allCategories.map((cat) => (
+            <nav
+              className={styles.filters}
+              aria-label="Filter courses by category"
+            >
+              {allCategories.map((category) => (
                 <button
-                  key={cat.id}
-                  className={`${styles.filterBtn} ${activeFilter === cat.id ? styles.filterActive : ''}`}
-                  onClick={() => setActiveFilter(cat.id)}
+                  key={category.id}
+                  type="button"
+                  className={`${styles.filterBtn} ${
+                    activeFilter === category.id
+                      ? styles.filterActive
+                      : ''
+                  }`}
+                  aria-pressed={activeFilter === category.id}
+                  onClick={() => setActiveFilter(category.id)}
                 >
-                  <span>{cat.emoji}</span>
-                  {cat.label}
+                  <span aria-hidden="true">{category.emoji}</span>{' '}
+                  {category.label}
                 </button>
               ))}
-            </div>
+            </nav>
 
-            {/* Results count */}
-            {(search || activeFilter !== 'all') && (
-              <p className={styles.resultCount}>
-                {filtered.length} course{filtered.length !== 1 ? 's' : ''} found
-                {search && <> for &quot;<strong>{search}</strong>&quot;</>}
+            {(normalizedSearch || activeFilter !== 'all') && (
+              <p className={styles.resultCount} aria-live="polite">
+                {filtered.length} course
+                {filtered.length !== 1 ? 's' : ''} found
+                {normalizedSearch && (
+                  <>
+                    {' '}for <strong>&quot;{search.trim()}&quot;</strong>
+                  </>
+                )}
               </p>
             )}
 
-            {/* Category sections when no filter active */}
-            {activeFilter === 'all' && search === '' ? (
+            {showCategorySections ? (
               <div className={styles.categorySections}>
-                {categories.map((cat) => (
-                  <div key={cat.id} className={styles.catSection}>
+                {categories.map((category) => (
+                  <section
+                    key={category.id}
+                    className={styles.catSection}
+                    aria-labelledby={`category-${category.id}`}
+                  >
                     <div className={styles.catHeader}>
-                      <span className={styles.catEmoji}>{cat.emoji}</span>
+                      <span className={styles.catEmoji} aria-hidden="true">
+                        {category.emoji}
+                      </span>
+
                       <div>
-                        <h2 className={styles.catTitle}>{cat.label}</h2>
+                        <h2
+                          id={`category-${category.id}`}
+                          className={styles.catTitle}
+                        >
+                          {category.label}
+                        </h2>
+
                         <span className={styles.catCount}>
-                          {cat.courses.length} course{cat.courses.length !== 1 ? 's' : ''} · $
-                          {cat.courses[0].price.toFixed(2)} each
+                          {category.courses.length} course
+                          {category.courses.length !== 1 ? 's' : ''}
                         </span>
                       </div>
                     </div>
+
                     <div className={styles.grid}>
-                      {cat.courses.map((course) => (
-                        <CourseCard key={course.id} course={course} showCategory={false} />
+                      {category.courses.map((course) => (
+                        <CourseCard
+                          key={course.id}
+                          course={course}
+                          showCategory={false}
+                        />
                       ))}
                     </div>
-                  </div>
+                  </section>
                 ))}
               </div>
             ) : filtered.length > 0 ? (
@@ -119,11 +180,19 @@ export default function CoursesPage() {
               </div>
             ) : (
               <div className={styles.empty}>
-                <span className={styles.emptyIcon}>🔍</span>
+                <span className={styles.emptyIcon} aria-hidden="true">
+                  🔍
+                </span>
+
                 <p>No courses found. Try a different search or category.</p>
+
                 <button
+                  type="button"
                   className={styles.emptyReset}
-                  onClick={() => { setSearch(''); setActiveFilter('all'); }}
+                  onClick={() => {
+                    setSearch('');
+                    setActiveFilter('all');
+                  }}
                 >
                   Clear filters
                 </button>
