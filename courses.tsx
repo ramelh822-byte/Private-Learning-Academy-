@@ -1,208 +1,333 @@
 
-import Head from 'next/head';
-import { useState } from 'react';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import CourseCard from '../components/CourseCard';
-import { courses, categories } from '../data/courses';
-import styles from './courses.module.css';
+export type Course = {
+  id: string;
+  emoji: string;
+  title: string;
+  category: string;
+  price: number;
+  description: string;
+  gumroadLink: string;
+  featured?: boolean;
+};
 
-export default function CoursesPage() {
-  const [activeFilter, setActiveFilter] = useState<string>('all');
-  const [search, setSearch] = useState('');
+export type Category = {
+  id: string;
+  emoji: string;
+  label: string;
+  courses: Course[];
+};
 
-  const allCategories = [
-    { id: 'all', label: 'All Courses', emoji: '✨' },
-    ...categories.map((category) => ({
-      id: category.id,
-      label: category.label,
-      emoji: category.emoji,
-    })),
-  ];
+const originalCourses: Course[] = [
+  {
+    id: 'islamic-scholar-ai',
+    emoji: '☪️',
+    title: 'Islamic Scholar AI',
+    category: 'Faith & Spirituality',
+    price: 49.99,
+    description: 'Explore Islamic knowledge with an AI-guided learning experience.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/gfzkwx',
+    featured: true,
+  },
+  {
+    id: 'bible-scholar-ai',
+    emoji: '✝️',
+    title: 'Bible Scholar AI',
+    category: 'Faith & Spirituality',
+    price: 49.99,
+    description: 'Study biblical topics through guided learning.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/sydvnr',
+    featured: true,
+  },
+  {
+    id: 'torah-scholar-ai',
+    emoji: '✡️',
+    title: 'Torah Scholar AI',
+    category: 'Faith & Spirituality',
+    price: 49.99,
+    description: 'Explore Torah studies with an AI-guided learning experience.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/xlcipm',
+  },
+  {
+    id: 'spanish',
+    emoji: '🇪🇸',
+    title: 'Spanish',
+    category: 'Languages',
+    price: 49.99,
+    description: 'Build Spanish vocabulary, comprehension, and conversation skills.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/fzycak',
+    featured: true,
+  },
+  {
+    id: 'french',
+    emoji: '🇫🇷',
+    title: 'French',
+    category: 'Languages',
+    price: 49.99,
+    description: 'Learn French with a guided, AI-supported study experience.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/cidcgg',
+  },
+  {
+    id: 'mandarin',
+    emoji: '🇨🇳',
+    title: 'Mandarin',
+    category: 'Languages',
+    price: 49.99,
+    description: 'Practice Mandarin vocabulary and language fundamentals.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/seebgl',
+  },
+  {
+    id: 'german',
+    emoji: '🇩🇪',
+    title: 'German',
+    category: 'Languages',
+    price: 49.99,
+    description: 'Develop German language skills through guided practice.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/dzuurr',
+  },
+  {
+    id: 'italian',
+    emoji: '🇮🇹',
+    title: 'Italian',
+    category: 'Languages',
+    price: 49.99,
+    description: 'Learn Italian vocabulary, grammar, and conversation.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/cxvuc',
+  },
+  {
+    id: 'portuguese',
+    emoji: '🇵🇹',
+    title: 'Portuguese',
+    category: 'Languages',
+    price: 49.99,
+    description: 'Build Portuguese skills with guided language practice.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/lmsgrg',
+  },
+  {
+    id: 'japanese',
+    emoji: '🇯🇵',
+    title: 'Japanese',
+    category: 'Languages',
+    price: 49.99,
+    description: 'Explore Japanese vocabulary, writing, and conversation.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/akfpsk',
+  },
+  {
+    id: 'korean',
+    emoji: '🇰🇷',
+    title: 'Korean',
+    category: 'Languages',
+    price: 49.99,
+    description: 'Learn Korean language fundamentals and practical phrases.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/imtdka',
+  },
+  {
+    id: 'arabic',
+    emoji: '🇸🇦',
+    title: 'Arabic',
+    category: 'Languages',
+    price: 49.99,
+    description: 'Practice Arabic vocabulary and language fundamentals.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/lrwwvs',
+  },
+  {
+    id: 'russian',
+    emoji: '🇷🇺',
+    title: 'Russian',
+    category: 'Languages',
+    price: 49.99,
+    description: 'Build Russian vocabulary, comprehension, and conversation skills.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/pbsszz',
+  },
+  {
+    id: 'piano',
+    emoji: '🎹',
+    title: 'Piano',
+    category: 'Music',
+    price: 59.99,
+    description: 'Develop piano skills through structured musical practice.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/lqgfhzl',
+    featured: true,
+  },
+  {
+    id: 'guitar',
+    emoji: '🎸',
+    title: 'Guitar',
+    category: 'Music',
+    price: 59.99,
+    description: 'Learn guitar fundamentals, chords, and practice techniques.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/mexiun',
+  },
+  {
+    id: 'music-theory',
+    emoji: '🎼',
+    title: 'Music Theory',
+    category: 'Music',
+    price: 59.99,
+    description: 'Understand musical notation, harmony, rhythm, and structure.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/bhraet',
+  },
+  {
+    id: 'python',
+    emoji: '🐍',
+    title: 'Python',
+    category: 'Programming',
+    price: 59.99,
+    description: 'Learn Python programming concepts and practical coding skills.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/jeqfxe',
+    featured: true,
+  },
+  {
+    id: 'javascript',
+    emoji: '💛',
+    title: 'JavaScript',
+    category: 'Programming',
+    price: 59.99,
+    description: 'Build JavaScript skills for interactive applications and websites.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/trxoo',
+  },
+  {
+    id: 'web-development',
+    emoji: '🌐',
+    title: 'Web Development',
+    category: 'Programming',
+    price: 59.99,
+    description: 'Explore the fundamentals of building websites and web applications.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/gxiyf',
+  },
+  {
+    id: 'mobile-development',
+    emoji: '📱',
+    title: 'Mobile Development',
+    category: 'Programming',
+    price: 59.99,
+    description: 'Learn the core concepts behind mobile application development.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/fidin',
+  },
+  {
+    id: 'entrepreneurship',
+    emoji: '🚀',
+    title: 'Entrepreneurship',
+    category: 'Business',
+    price: 59.99,
+    description: 'Explore business ideas, validation, planning, and growth.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/pihcm',
+    featured: true,
+  },
+  {
+    id: 'leadership-mastery',
+    emoji: '🧭',
+    title: 'Leadership Mastery',
+    category: 'Business',
+    price: 59.99,
+    description: 'Develop leadership, communication, and decision-making skills.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/extkgs',
+  },
+  {
+    id: 'data-analytics',
+    emoji: '📊',
+    title: 'Data Analytics',
+    category: 'Business',
+    price: 59.99,
+    description: 'Learn how to interpret data and turn findings into insights.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/dqevad',
+  },
+  {
+    id: 'project-management',
+    emoji: '📋',
+    title: 'Project Management',
+    category: 'Business',
+    price: 59.99,
+    description: 'Explore project planning, delivery, and team coordination.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/hemree',
+  },
+  {
+    id: 'digital-marketing',
+    emoji: '📣',
+    title: 'Digital Marketing',
+    category: 'Business',
+    price: 59.99,
+    description: 'Explore digital marketing strategy, content, and campaigns.',
+    gumroadLink: 'https://rayhymn.gumroad.com/l/zvhzb',
+  },
+];
 
-  const normalizedSearch = search.trim().toLowerCase();
+const newGumroadLinks = [
+  'rblhrl',
+  'zfxsh',
+  'mpcxsh',
+  'ehvham',
+  'clorgf',
+  'wbzcuy',
+  'kmfoxq',
+  'zqjvcl',
+  'mqjyem',
+  'rcdxu',
+  'jlmiwb',
+  'ajlfzf',
+  'nftsiu',
+  'ymxuc',
+  'fhwioc',
+  'yfahb',
+  'liuuqi',
+  'rahoyq',
+  'dthfli',
+  'aecqj',
+  'ptvnk',
+  'kzrriw',
+  'terrxi',
+  'wchzs',
+  'fdzcbo',
+  'jdbnzn',
+];
 
-  const filtered = courses.filter((course) => {
-    const selectedCategory = categories.find(
-      (category) => category.id === activeFilter
-    );
+const newCourses: Course[] = newGumroadLinks.map((slug, index) => ({
+  id: `new-product-${String(index + 1).padStart(2, '0')}`,
+  emoji: '✨',
+  title: `New Gumroad Product ${index + 1}`,
+  category: 'Business',
+  price: 59.99,
+  description:
+    'New Planet Leads Academy product. Confirm the product title, description, category, and price before publishing.',
+  gumroadLink: `https://rayhymn.gumroad.com/l/${slug}`,
+}));
 
-    const matchCategory =
-      activeFilter === 'all' ||
-      selectedCategory?.label === course.category;
+export const courses: Course[] = [...originalCourses, ...newCourses];
 
-    const matchSearch =
-      normalizedSearch === '' ||
-      course.title.toLowerCase().includes(normalizedSearch) ||
-      course.category.toLowerCase().includes(normalizedSearch) ||
-      course.description.toLowerCase().includes(normalizedSearch);
+export const categories: Category[] = [
+  {
+    id: 'faith-spirituality',
+    emoji: '🙏',
+    label: 'Faith & Spirituality',
+    courses: courses.filter(
+      (course) => course.category === 'Faith & Spirituality'
+    ),
+  },
+  {
+    id: 'languages',
+    emoji: '🌍',
+    label: 'Languages',
+    courses: courses.filter((course) => course.category === 'Languages'),
+  },
+  {
+    id: 'music',
+    emoji: '🎵',
+    label: 'Music',
+    courses: courses.filter((course) => course.category === 'Music'),
+  },
+  {
+    id: 'programming',
+    emoji: '💻',
+    label: 'Programming',
+    courses: courses.filter((course) => course.category === 'Programming'),
+  },
+  {
+    id: 'business',
+    emoji: '💼',
+    label: 'Business',
+    courses: courses.filter((course) => course.category === 'Business'),
+  },
+];
 
-    return matchCategory && matchSearch;
-  });
-
-  const showCategorySections =
-    activeFilter === 'all' && normalizedSearch === '';
-
-  return (
-    <>
-      <Head>
-        <title>All Courses — Planet Leads Academy</title>
-        <meta
-          name="description"
-          content="Explore AI-guided courses in Faith, Languages, Music, Programming, and Business at Planet Leads Academy."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
-
-      <div className={styles.page}>
-        <Navbar />
-
-        <main className={styles.main}>
-          <section className={styles.hero}>
-            <div className={styles.heroBg} />
-
-            <div className="container">
-              <h1 className={styles.title}>All Courses</h1>
-
-              <p className={styles.sub}>
-                {courses.length} AI-powered courses across{' '}
-                {categories.length} categories
-              </p>
-
-              <div className={styles.searchWrap}>
-                <span className={styles.searchIcon} aria-hidden="true">
-                  🔍
-                </span>
-
-                <input
-                  className={styles.search}
-                  type="search"
-                  placeholder="Search courses..."
-                  aria-label="Search courses"
-                  value={search}
-                  onChange={(event) => setSearch(event.target.value)}
-                />
-
-                {search && (
-                  <button
-                    type="button"
-                    className={styles.searchClear}
-                    onClick={() => setSearch('')}
-                    aria-label="Clear search"
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-            </div>
-          </section>
-
-          <div className="container">
-            <nav
-              className={styles.filters}
-              aria-label="Filter courses by category"
-            >
-              {allCategories.map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  className={`${styles.filterBtn} ${
-                    activeFilter === category.id
-                      ? styles.filterActive
-                      : ''
-                  }`}
-                  aria-pressed={activeFilter === category.id}
-                  onClick={() => setActiveFilter(category.id)}
-                >
-                  <span aria-hidden="true">{category.emoji}</span>{' '}
-                  {category.label}
-                </button>
-              ))}
-            </nav>
-
-            {(normalizedSearch || activeFilter !== 'all') && (
-              <p className={styles.resultCount} aria-live="polite">
-                {filtered.length} course
-                {filtered.length !== 1 ? 's' : ''} found
-                {normalizedSearch && (
-                  <>
-                    {' '}for <strong>&quot;{search.trim()}&quot;</strong>
-                  </>
-                )}
-              </p>
-            )}
-
-            {showCategorySections ? (
-              <div className={styles.categorySections}>
-                {categories.map((category) => (
-                  <section
-                    key={category.id}
-                    className={styles.catSection}
-                    aria-labelledby={`category-${category.id}`}
-                  >
-                    <div className={styles.catHeader}>
-                      <span className={styles.catEmoji} aria-hidden="true">
-                        {category.emoji}
-                      </span>
-
-                      <div>
-                        <h2
-                          id={`category-${category.id}`}
-                          className={styles.catTitle}
-                        >
-                          {category.label}
-                        </h2>
-
-                        <span className={styles.catCount}>
-                          {category.courses.length} course
-                          {category.courses.length !== 1 ? 's' : ''}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className={styles.grid}>
-                      {category.courses.map((course) => (
-                        <CourseCard
-                          key={course.id}
-                          course={course}
-                          showCategory={false}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                ))}
-              </div>
-            ) : filtered.length > 0 ? (
-              <div className={styles.grid}>
-                {filtered.map((course) => (
-                  <CourseCard key={course.id} course={course} />
-                ))}
-              </div>
-            ) : (
-              <div className={styles.empty}>
-                <span className={styles.emptyIcon} aria-hidden="true">
-                  🔍
-                </span>
-
-                <p>No courses found. Try a different search or category.</p>
-
-                <button
-                  type="button"
-                  className={styles.emptyReset}
-                  onClick={() => {
-                    setSearch('');
-                    setActiveFilter('all');
-                  }}
-                >
-                  Clear filters
-                </button>
-              </div>
-            )}
-          </div>
-        </main>
-
-        <Footer />
-      </div>
-    </>
-  );
-}
+export const featuredCourses: Course[] = courses.filter(
+  (course) => course.featured
+);
